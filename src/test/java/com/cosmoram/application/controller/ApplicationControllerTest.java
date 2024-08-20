@@ -3,15 +3,8 @@ package com.cosmoram.application.controller;
 import com.cosmoram.application.entity.Application;
 import com.cosmoram.application.exception.ApplicationBadRequestException;
 import com.cosmoram.application.service.ApplicationService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,10 +100,6 @@ public class ApplicationControllerTest {
                 .build();
 
         performPositiveTest(application, status().is2xxSuccessful());
-    }
-
-    private String toJson(Object obj) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(obj);
     }
 
     @Test
@@ -235,6 +224,7 @@ public class ApplicationControllerTest {
 
     }
 
+    //FIXME Test case on duplicate request is not working.
     /*@Test
     @Order(10)
     @DisplayName("Duplicate Request")
@@ -294,12 +284,11 @@ public class ApplicationControllerTest {
                         .header(ApplicationController.HEADER_CORRELATION_ID,
                                 "DummyCorrelation")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(application)))
+                        .content(application.toJson()))
                 .andExpect(responseCode)
                 .andExpect(responseString);
     }
 
-    @SuppressWarnings("checkstyle:WhitespaceAround")
     private void performPositiveTest(Application application,
                                      ResultMatcher responseCode)
             throws Exception, ApplicationBadRequestException {
@@ -313,13 +302,12 @@ public class ApplicationControllerTest {
                         .header(ApplicationController.HEADER_CORRELATION_ID,
                                 "DummyCorrelation")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(application)))
+                        .content(application.toJson()))
                 .andExpect(responseCode)
                 .andReturn();
 
-        Application returnedApplication = objectMapper.readValue(
-                mvcResult.getResponse().getContentAsString(),
-                new TypeReference<Application>() {});
+        Application returnedApplication = Application.toApplication(
+                mvcResult.getResponse().getContentAsString());
 
         Assertions.assertNotNull(returnedApplication.getId());
     }
@@ -343,7 +331,7 @@ public class ApplicationControllerTest {
                         .header(ApplicationController.HEADER_CORRELATION_ID,
                                 "DummyCorrelation")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(application)))
+                .content(application.toJson()))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(MISSING_SESSION_ID_ERROR));
 
@@ -368,7 +356,7 @@ public class ApplicationControllerTest {
                 .header(ApplicationController.HEADER_CORRELATION_ID,
                         "DummyCorrelation")
                 .contentType(MediaType.APPLICATION_JSON)
-                .contentType(toJson(application)))
+                .contentType(application.toJson()))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(MISSING_USER_ID_ERROR));
     }
@@ -392,7 +380,7 @@ public class ApplicationControllerTest {
                 .header(ApplicationController.HEADER_USER_ID,
                         "DummyUser")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(application)))
+                .content(application.toJson()))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(MISSING_CORRELATION_ID_ERROR));
     }

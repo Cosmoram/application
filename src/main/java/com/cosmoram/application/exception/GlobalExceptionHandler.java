@@ -33,13 +33,10 @@ public final class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationBadRequestException.class)
     public ResponseEntity<Map<String, List<ApplicationError>>>
-    handleDuplicateRequestError(ApplicationBadRequestException ex) {
-        List<ApplicationError> errors = List.of(new
-                ApplicationError("code", ex.getMessage()));
-
+    handleBadRequestException(ApplicationBadRequestException ex) {
 
         Map<String, List<ApplicationError>> errorMap =
-                Map.of("errors", errors);
+                Map.of("errors", ex.getErrors());
 
         return new ResponseEntity<>(errorMap, new HttpHeaders(),
                 HttpStatus.BAD_REQUEST);

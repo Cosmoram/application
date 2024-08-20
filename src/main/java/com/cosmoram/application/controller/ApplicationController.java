@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+//TODO Implement i18n for dynamic messages
 @RestController
 @RequestMapping(path = "/application/")
 public final class ApplicationController {
@@ -38,6 +39,7 @@ public final class ApplicationController {
 
             @Valid @RequestBody Application application)
             throws ApplicationBadRequestException {
+        applicationService.validateHeaders(sessionId, userId, correlationId);
         return new ResponseEntity<>(applicationService.save(application),
                 HttpStatus.CREATED);
     }
