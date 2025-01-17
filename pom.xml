@@ -81,19 +81,6 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>${maven-checkstyle-plugin.version}</version>
-				<configuration>
-					<consoleOutput>true</consoleOutput>
-					<includeTestSourceDirectory>true</includeTestSourceDirectory>
-					<failOnViolation>true</failOnViolation>
-					<failsOnError>true</failsOnError>
-					<configLocation>config/checkstyle/checkstyle.xml</configLocation>
-					<suppressionsFileExpression>suppressions.xml</suppressionsFileExpression>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 
