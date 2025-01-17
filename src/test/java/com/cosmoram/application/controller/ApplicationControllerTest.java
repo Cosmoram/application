@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.List;
@@ -51,7 +50,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(0)
     @DisplayName("Validate Resource Not Found")
-    public void testResourceNotFound() throws Exception {
+    void testResourceNotFound() throws Exception {
         mockMvc.perform(post("/dummyURL")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content((new Application()).toJson()))
@@ -65,8 +64,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(1)
     @DisplayName("Positive Scenario")
-    public void testAddApplication() throws Exception,
-            ApplicationBadRequestException {
+    void testAddApplication() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .name("Credit Finance Edge")
@@ -79,8 +77,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(2)
     @DisplayName("Validation with No Code")
-    public void testAddApplicationNoCode() throws Exception,
-            ApplicationBadRequestException {
+    void testAddApplicationNoCode() throws Exception {
         Application application = Application.builder()
                 .name("Credit Finance Edge")
                 .desc("AR for NCL")
@@ -108,8 +105,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(3)
     @DisplayName("Validation with No Name")
-    public void testAddApplicationNoName() throws Exception,
-            ApplicationBadRequestException {
+    void testAddApplicationNoName() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .desc("AR for NCL")
@@ -126,8 +122,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(4)
     @DisplayName("Validation with No Description")
-    public void testAddApplicationNoDesc() throws Exception,
-            ApplicationBadRequestException {
+    void testAddApplicationNoDesc() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .name("Credit Finance Edge")
@@ -144,8 +139,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(5)
     @DisplayName("Length validation for code. Less than Expected")
-    public void testAddValidationCodeLessThanExpected() throws Exception,
-            ApplicationBadRequestException {
+    void testAddValidationCodeLessThanExpected() throws Exception {
         Application application = Application.builder()
                 .code("2000")
                 .name("Credit Finance Edge")
@@ -172,8 +166,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(6)
     @DisplayName("Length validation for code. More than Expected")
-    public void testAddValidationCodeMoreThanExpected() throws Exception,
-            ApplicationBadRequestException {
+    void testAddValidationCodeMoreThanExpected() throws Exception {
         Application application = Application.builder()
                 .code("20002000000000000")
                 .name("Credit Finance Edge")
@@ -192,8 +185,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(7)
     @DisplayName("Length validation for name. Less than Expected")
-    public void testAddValidationNameLessThanExpected() throws Exception,
-            ApplicationBadRequestException {
+    void testAddValidationNameLessThanExpected() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .name("Cr")
@@ -212,8 +204,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(8)
     @DisplayName("Length validation for name. More than Expected")
-    public void testAddValidationNameMoreThanExpected() throws Exception,
-            ApplicationBadRequestException {
+    void testAddValidationNameMoreThanExpected() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .name("1234567890123456789012345678901234567890123456789012")
@@ -232,8 +223,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(8)
     @DisplayName("Length validation for Desc. Less than Expected")
-    public void testAddValidationDescLessThanExpected() throws Exception,
-            ApplicationBadRequestException {
+    void testAddValidationDescLessThanExpected() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .name("Credit Finance Edge")
@@ -253,8 +243,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(10)
     @DisplayName("Duplicate Request")
-    public void testAddDuplicateRequest() throws Exception,
-            ApplicationBadRequestException {
+    void testAddDuplicateRequest() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .name("Credit Finance Edge")
@@ -284,8 +273,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(9)
     @DisplayName("Length validation for Desc. More than Expected")
-    public void testAddValidationDescMoreThanExpected() throws Exception,
-            ApplicationBadRequestException {
+    void testAddValidationDescMoreThanExpected() throws Exception {
         String veryLongString =
                 "12345678901234567890123456789012345678901234567890"
                 + "12345678901234567890123456789012345678901234567890"
@@ -312,7 +300,7 @@ public class ApplicationControllerTest {
     private void performNegativeTest(Application application,
                                      ResultMatcher responseCode,
                                      ResultMatcher responseString)
-            throws Exception, ApplicationBadRequestException {
+            throws Exception {
         when(applicationService.save(application)).thenReturn(application);
 
         mockMvc.perform(post(APPLICATION_URI)
@@ -330,10 +318,10 @@ public class ApplicationControllerTest {
 
     private void performPositiveTest(Application application,
                                      ResultMatcher responseCode)
-            throws Exception, ApplicationBadRequestException {
+            throws Exception {
         when(applicationService.save(application)).thenReturn(application);
 
-        MvcResult mvcResult = mockMvc.perform(post(APPLICATION_URI)
+        mockMvc.perform(post(APPLICATION_URI)
                         .header(ApplicationController.HEADER_SESSION_ID,
                                 "DummySession")
                         .header(ApplicationController.HEADER_USER_ID,
@@ -344,42 +332,6 @@ public class ApplicationControllerTest {
                         .content(application.toJson()))
                 .andExpect(responseCode)
                 .andReturn();
-
-        Application returnedApplication = Application.toApplication(
-                mvcResult.getResponse().getContentAsString());
-
-        //Assertions.assertNotNull(returnedApplication.getId());
-    }
-
-    @Test
-    @Order(10)
-    @DisplayName("Header Validation with No Session Id")
-    public void testHeaderNoSessionId() throws ApplicationBadRequestException,
-            Exception {
-        Application application = Application.builder()
-                .code("200005405")
-                .name("Credit Finance Edge")
-                .desc("AR for NCL")
-                .build();
-
-        when(applicationService.save(application)).thenReturn(application);
-
-        mockMvc.perform(post(APPLICATION_URI)
-                        .header(ApplicationController.HEADER_USER_ID,
-                                "DummyUser")
-                        .header(ApplicationController.HEADER_CORRELATION_ID,
-                                "DummyCorrelation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(application.toJson()))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(
-                        getErrorMessageForStaticErrors(
-                                ApplicationController.HEADER_SESSION_ID,
-                        GlobalExceptionHandler.
-                                COSMORAM_APPLICATION_HEADER_ERROR,
-                        getMessageForHeaderMandatoryErrors(
-                                ApplicationController.HEADER_SESSION_ID))));
-
     }
 
     private static String getMessageForHeaderMandatoryErrors(String header) {
@@ -391,8 +343,7 @@ public class ApplicationControllerTest {
     @Test
     @Order(11)
     @DisplayName("Header Validation with No User Id")
-    public void testHeaderNoUser() throws ApplicationBadRequestException,
-            Exception {
+    void testHeaderNoUser() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .name("Credit Finance Edge")
@@ -419,10 +370,39 @@ public class ApplicationControllerTest {
     }
 
     @Test
+    @Order(10)
+    @DisplayName("Header Validation with No Session Id")
+    void testHeaderNoSessionId() throws Exception {
+        Application application = Application.builder()
+                .code("200005405")
+                .name("Credit Finance Edge")
+                .desc("AR for NCL")
+                .build();
+
+        when(applicationService.save(application)).thenReturn(application);
+
+        mockMvc.perform(post(APPLICATION_URI)
+                        .header(ApplicationController.HEADER_USER_ID,
+                                "DummyUser")
+                        .header(ApplicationController.HEADER_CORRELATION_ID,
+                                "DummyCorrelation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(application.toJson()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(
+                        getErrorMessageForStaticErrors(
+                                ApplicationController.HEADER_SESSION_ID,
+                                GlobalExceptionHandler.
+                                        COSMORAM_APPLICATION_HEADER_ERROR,
+                                getMessageForHeaderMandatoryErrors(
+                                        ApplicationController.HEADER_SESSION_ID))));
+
+    }
+
+    @Test
     @Order(12)
     @DisplayName("Header Validation with No Correlation Id")
-    public void testHeaderNoCorrelation() throws ApplicationBadRequestException,
-            Exception {
+    void testHeaderNoCorrelation() throws Exception {
         Application application = Application.builder()
                 .code("200005405")
                 .name("Credit Finance Edge")

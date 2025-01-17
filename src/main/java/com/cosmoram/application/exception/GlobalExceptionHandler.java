@@ -25,9 +25,14 @@ public final class GlobalExceptionHandler {
             "cosmoram.application.header_error";
     public static final String COSMORAM_APPLICATION_NOT_FOUND =
             "cosmoram.application.not_found";
+    public static final String ERRORS = "errors";
+
+    private final MessageSource messageSource;
 
     @Autowired
-    private MessageSource messageSource;
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, List<ApplicationError>>>
@@ -38,9 +43,9 @@ public final class GlobalExceptionHandler {
                         e.getDefaultMessage())).toList();
 
         Map<String, List<ApplicationError>> errorMap =
-            new HashMap<String, List<ApplicationError>>();
+            new HashMap<>();
 
-        errorMap.put("errors", errors);
+        errorMap.put(ERRORS, errors);
 
         return new ResponseEntity<>(errorMap, new HttpHeaders(),
                 HttpStatus.BAD_REQUEST);
@@ -56,7 +61,7 @@ public final class GlobalExceptionHandler {
                                 null, "Default Message",
                                 LocaleContextHolder.getLocale())));
         Map<String, List<ApplicationError>> errorMap =
-                Map.of("errors", ex.getErrors());
+                Map.of(ERRORS, ex.getErrors());
 
         return new ResponseEntity<>(errorMap, new HttpHeaders(),
                 HttpStatus.BAD_REQUEST);
@@ -67,7 +72,7 @@ public final class GlobalExceptionHandler {
     handleHeaderExceptions(MissingRequestHeaderException ex) {
 
         Map<String, List<ApplicationError>> errorMap = Map.of(
-                "errors",
+                ERRORS,
                 List.of(new ApplicationError(ex.getHeaderName(),
                         COSMORAM_APPLICATION_HEADER_ERROR,
                         ex.getMessage()
@@ -79,7 +84,7 @@ public final class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, List<ApplicationError>>>
     handleResourceNotFoundException(NoResourceFoundException ex) {
-        return new ResponseEntity<>(Map.of("errors",
+        return new ResponseEntity<>(Map.of(ERRORS,
                 List.of(new ApplicationError("",
                         COSMORAM_APPLICATION_NOT_FOUND,
                         messageSource.getMessage(COSMORAM_APPLICATION_NOT_FOUND,

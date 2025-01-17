@@ -25,8 +25,12 @@ public final class ApplicationController {
     public static final String HEADER_CORRELATION_ID = "correlation-id";
     public static final String VERSION = "version";
 
+    private final ApplicationService applicationService;
+
     @Autowired
-    private ApplicationService applicationService;
+    public ApplicationController(ApplicationService applicationService) {
+        this.applicationService = applicationService;
+    }
 
     @GetMapping(path = "/health")
     public ResponseEntity<Application> health() {

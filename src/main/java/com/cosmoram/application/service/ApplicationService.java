@@ -24,8 +24,13 @@ public final class ApplicationService {
     public static final int USER_ID_LENGTH_UPPER_LIMIT = 10;
     public static final int CORRELATION_ID_LENGTH_LOWER_LIMIT = 3;
     public static final int CORRELATION_ID_LENGTH_UPPER_LIMIT = 360;
+
+    private final ApplicationRepository applicationRepository;
+
     @Autowired
-    private ApplicationRepository applicationRepository;
+    public ApplicationService(ApplicationRepository applicationRepository) {
+        this.applicationRepository = applicationRepository;
+    }
 
     public Application save(Application application) throws
             ApplicationBadRequestException {
@@ -44,7 +49,7 @@ public final class ApplicationService {
     public void validateHeaders(String sessionId, String userId,
                                 String correlationId)
             throws ApplicationBadRequestException {
-        List<ApplicationError> errorList = new ArrayList<ApplicationError>();
+        List<ApplicationError> errorList = new ArrayList<>();
 
         validateHeader(errorList, sessionId, "sessionId",
                 new int[]{SESSION_ID_LENGTH_LOWER_LIMIT,
